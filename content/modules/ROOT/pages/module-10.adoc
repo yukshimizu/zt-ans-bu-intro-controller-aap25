@@ -120,7 +120,7 @@ question、variable name、type、default value など、UIを通じて手動で
 
 === YAML 定義
 
-`controller-as-code/configs/module-10/controller_objects.yml`から
+`controller-as-code/configs/module-10/controller_objects.yml` から
 
 [source,yaml]
 ----

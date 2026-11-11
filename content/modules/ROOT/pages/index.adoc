@@ -1,0 +1,6 @@
+= はじめに
+:page-pagination: true
+
+この演習では、Ansible Automation Controller 2.7 の基本操作を段階的に学習します。
+
+左側のナビゲーターから、各モジュールを順番に進めてください。

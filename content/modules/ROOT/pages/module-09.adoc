@@ -156,7 +156,7 @@ Visualizer でグラフィカルに構築した workflow（ノード接続や並
 
 === YAML 定義
 
-`controller-as-code/configs/module-09/controller_objects.yml`から
+`controller-as-code/configs/module-09/controller_objects.yml` から
 
 [source,yaml]
 ----

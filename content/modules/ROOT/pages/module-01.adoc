@@ -47,8 +47,6 @@
 
 == Controller as Code (CaC) の紹介
 
-Throughout this workshop, you will create automation controller objects (inventories projects, credentials, job templates, and workflows) using the web UI. However, in production environments, these same objects can be managed **declaratively as code** using the link:https://github.com/redhat-cop/infra.aap_configuration[infra.aap_configuration^] collection.
-
 このワークショップでは、Web UI を使用して Automation Controller オブジェクト (Inventory、 Project、 Credential、 Job Templates、 Workflow) を作成します。ただし、本番環境では、これらのオブジェクトを次のリンク先にあるコレクション (link:https://github.com/redhat-cop/infra.aap_configuration[infra.aap_configuration^]) を使用して、**宣言的にコードとして** 管理できます。
 
 このアプローチは **Controller as Code (CaC)** と呼ばれ、以下のことが可能になります。

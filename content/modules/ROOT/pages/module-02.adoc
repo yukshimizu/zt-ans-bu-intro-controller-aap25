@@ -1,0 +1,111 @@
+= モジュール 2: Automation Controller 入門
+:notoc:
+:toc-title: Table of Contents
+:nosectnums:
+:icons: font
+
+_Dashboard、Inventories、Project、Job Template を含む Automation Controller Web UI の入門ガイド。_
+
+---
+
+== ラボ概要
+
+このセクションでは、このラボで操作する Automation Controller UI の主要コンポーネントを紹介します。
+
+=== Ansible Automation Platform へようこそ
+
+次の章では、Web UI ダッシュボードを確認し、**Inventory**、**Project**、**Job Template** の各セクションを操作します。
+
+=== Automation Platform の概要
+
+**Overview** 画面はメインダッシュボードです。Host、Project、Inventory の概要が表示され、各数値は対応オブジェクトへのリンクになっています。リソース数の下には Job Activity グラフと、最近の Job、Project、Inventory のカード形式サマリーが表示されます。
+
+image::controller-dashboard.png[Automation controller overview dashboard, opts="border"]
+
+=== Automation Controller Jobs ビュー
+
+左側ナビゲーションメニューの **Automation Execution** → **Jobs** をクリックすると **Jobs** ビューを開けます。このビューには、プロジェクト同期、SCM 更新、Playbook 実行など、これまでに実行されたすべてのジョブが表示されます。
+
+image::jobs-view.png[Jobs view in automation controller, opts="border"]
+
+=== Schedules ビュー
+
+左側ナビゲーションメニューの **Automation Execution** → **Schedules** をクリックすると **Schedules** ビューを開けます。このビューには、定期実行するように設定されたスケジュール済みジョブが表示されます。ジョブ起動、インベントリーソース同期、バージョン管理からのプロジェクト内容取り込みに利用できます。
+
+image::schedules-view.png[Schedules view in automation controller, opts="border"]
+
+---
+
+== ラボガイド
+
+*Introduction to automation controller* ラボへようこそ。これ以降のチャレンジでは、Inventory の作成や Project の Import から、Job Tempate や Workflow の作成まで、Web UI から Ansible Playbook を実行する方法を学びます。
+
+新しい統合 UI には複数のセクションがありますが、このラボでは **Automation Execution (Automation Controller)** ビューに注目します。
+
+image::automation-execution-view.png[Automation Execution menu highlighted, opts="border"]
+
+左側の画面はログインページです。続行するため、以下の認証情報でログインしてください。
+
+[IMPORTANT]
+====
+* *Username:* `admin`
+* *Password:* `ansible123!`
+====
+
+=== Task 1: Overview を確認する
+
+最初のタスクでは **Overview** ダッシュボードを確認します。初期状態では最近のアクティビティが少ないため情報は少なめですが、ラボ完了後に再度確認すると違いが分かります。
+
+次のセクションがあります。
+
+* **Resource Counts:** *Hosts*、*Projects*、*Inventories* のサマリー
+* **Job Activity:** 過去1か月のジョブ実行を示すグラフ
+* **Jobs:** 最近実行されたジョブの一覧
+* **Projects:** 最近更新されたプロジェクトの一覧
+* **Inventories:** 最近更新されたインベントリーの一覧
+
+Ansible Automation Platform 2.7 には、インストール後すぐに使い始めるのに役立つクイックスタートガイドとインタラクティブな操作ガイドが用意されています。
+
+image:quick-starts.png[Quick start guides on the dashboard, opts="border"]
+
+各タイトルや "View all" リンクをクリックして、対応セクションを自由に確認してください。
+
+=== Task 2: Inventories セクションを確認する
+
+**Inventory** は Playbook の実行対象となる Host の集合です。コマンドラインで使う inventory file と同じ概念ですが、追加機能と再利用性があります。
+
+. **Inventories ページへ移動する。**
++
+*Overview* ページの **View all Inventories** リンク、または左側ナビゲーションメニューの **Automation Execution** → **Infrastructure** → **Inventories** から移動します。
+
+. **Demo Inventory を確認する。**
++
+事前に用意されている **Demo Inventory** をクリックし、利用可能なフィールドに慣れるために各タブを確認します。後続で独自の inventory を作成します。
+
+=== Task 3: Projects セクションを確認する
+
+**Project** は Automation Controller 内での Ansible Playbook の論理的なグループです。これらの Playbook は通常、Git のようなソースコード管理システムに配置されています。
+
+. **Projects ページへ移動する。**
++
+左側ナビゲーションメニューで **Automation Execution** → **Projects** に移動します。
+
+. **Demo Project を確認する。**
++
+事前に用意されている **Demo Project** をクリックし、利用可能な各フィールドとタブを確認します。
+
+---
+
+== Controller as Code Alternative
+
+このチャレンジで扱った Demo Inventory と Demo Project には、Automation Controller がプリロードされています。CaC アプローチでは、これらのデフォルトオブジェクトも宣言的に管理できます。次の課題から、UIで作成したすべてのオブジェクトが、`infra.aap_configuration` コレクションを使用して同等のYAML表現を持つことがわかります。
+
+---
+
+== 次のステップ
+
+次のチャレンジでは、独自の Inventory を作成し、管理する Host を追加します。続行するには、下の青い `Next` ボタンを押してください。
+
+== トラブルシューティング
+
+問題が発生した場合や不具合を見つけた場合は、link:https://github.com/rhpds/zt-ans-bu-intro-controller-aap25/issues[GitHub で issue を作成してください]。

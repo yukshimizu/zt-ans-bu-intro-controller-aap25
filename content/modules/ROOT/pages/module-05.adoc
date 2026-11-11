@@ -1,0 +1,124 @@
+= モジュール 5: Credential の理解
+:notoc:
+:toc-title: Table of Contents
+:nosectnums:
+:icons: font
+
+_Credentials セクションを確認し、Automation Controller の認証オプションを理解するためのガイド。_
+
+---
+
+== ラボ概要
+
+**Credential** は、マシンに対するジョブ実行時の認証、Inventory source との同期、バージョン管理システムからの Project 取り込み時の認証に使用されます。
+
+image::credentials-view.png[Details of a machine credential, opts="border"]
+
+---
+
+== ラボガイド
+
+**Credential** は Ansible Automation Platform で、デバイスへのジョブ実行、Inventory source 同期、バージョン管理からの Project 取り込み時の認証に利用されます。
+
+Credential は Automation Controller に暗号化して保存され、どのユーザーでも平文では取得できません。ユーザーやチームに、機密情報を開示せずに Credential 利用権限を付与できます。
+
+サポートされる Credential type は 20 種類以上あり、トークン、ユーザー名/パスワード、SSH キーなどがあります。今回は、SSH でサーバー接続に使う **Machine** Credential type を確認します。
+
+[WARNING]
+====
+この演習では確認のみを行います。credentials は事前投入済みなので、変更はしないでください。
+====
+
+[IMPORTANT]
+====
+automation controller へのログイン認証情報:
+
+* *Username:* `admin`
+* *Password:* `ansible123!`
+====
+
+=== Task 1: Credentials セクションを確認する
+
+最初に Credentials セクションへ移動し、事前投入済みの credential を確認します。
+
+. **Credentials ページへ移動する。**
++
+左側ナビゲーションメニューで **Automation Execution** → **Infrastructure** → **Credentials** に移動します。
+
+. **credentials 一覧を表示する。**
++
+名前とタイプで分類された、検索可能な credential 一覧が表示されます。
+
+. **ラボ用 credential を開く。**
++
+*Machine* タイプの `lab-credentials` を **探して**、名前を **クリック** します。
+
+. **credential の詳細を確認する。**
++
+*Details* タブで、*SSH Private Key* フィールドが **Encrypted** と表示されることを確認します。
+
+. **credential のアクセス権を確認する。**
++
+**Team Access** と **User Access** タブを **クリック** し、この credential を使用できる users と teams を確認します。
+
+. **credential の使用状況を確認する。**
++
+**Job Templates** タブを **クリック** します。このタブには、この credential を利用中のジョブが表示されます。現時点では空のはずです。
+
+=== Task 2: Machine Credential を確認する
+
+次に credential の編集画面に入り、利用可能なフィールドを確認します。
+
+. **credential の編集画面を開く。**
++
+`lab-credentials` の *Details* タブに戻り、**Edit credential** ボタンを **クリック** します。
+
+. **利用可能なフィールドを確認する。**
++
+Machine credential で利用できる設定項目を確認しますが、*何も編集・変更しないでください*。
+
+. **暗号化キーを確認する。**
++
+*SSH Private Key* フィールドは値の **Reset** のみ可能です。前述の通り、キーは暗号化されるため、一度保存すると UI からは取得できません。
+
+. **編集画面を閉じる。**
++
+誤操作を避けるため、**Cancel** ボタンを **クリック** して終了します。
+
+---
+
+== Controller as Code Alternative
+
+確認した `lab-credentials` 資格情報は、このワークショップ用に事前にロードされています。 CaC アプローチでは、資格情報は変数として定義され、自動的に適用されます。 SSH 秘密キーは、Ansible の `lookup` を使用して安全に読み取られます。
+
+=== YAML 定義
+
+`controller-as-code/configs/module-05/controller_objects.yml` から
+
+[source,yaml]
+----
+---
+controller_credentials:
+  - name: lab-credentials
+    credential_type: Machine
+    organization: Default
+    inputs:
+      username: rhel
+      password: ansible123!
+      ssh_key_data: "{{ lookup('file', '/home/rhel/.ssh/id_rsa') }}"
+----
+
+[NOTE]
+====
+本番環境では、パスワードやSSHキーなどの機密情報は、**Ansible Vault** または外部のシークレットマネージャ（例：HashiCorp Vault、Cyber​​Ark）に保存する必要があります。`infra.aap_configuration` コレクションは、外部シークレット検索用の認証情報入力ソースをサポートしています。
+====
+
+---
+
+== 次のステップ
+
+続行するには、下の青い `Next` ボタンを押してください。
+
+== トラブルシューティング
+
+問題が発生した場合や不具合を見つけた場合は、link:https://github.com/rhpds/zt-ans-bu-intro-controller-aap25/issues[GitHub で issue を作成してください]。

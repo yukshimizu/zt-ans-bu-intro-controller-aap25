@@ -1,0 +1,107 @@
+= モジュール 4: 最初の Project の作成
+:notoc:
+:toc-title: Table of Contents
+:nosectnums:
+:icons: font
+
+_Project を使って最初の Ansible Playbook を Automation Controller に取り込むためのガイド。_
+
+---
+
+== ラボ概要
+
+**Project** は Ansible Playbook の論理的なコレクションです。Playbook は、Git、Subversion、Red Hat Insights など、Automation Controller が対応するソースコード管理（SCM）システムで管理できます。
+
+image::projects-list-all.png[Projects list view in automation controller, opts="border"]
+
+---
+
+== ラボガイド
+
+Automation Controller の **Project** は、ディレクトリから 1 つ以上の Ansible Playbook（関連する roles やコンテンツを含む）を取り込む仕組みです。Automation Controller の Web UI で playbook の作成や編集はできませんが、Git リポジトリーのようなソースから Project を通じて取り込みます。
+
+このチャレンジでは、簡単な Apache playbook を含む GitHub リポジトリーを取り込む最初の Project を作成します。
+
+[IMPORTANT]
+====
+automation controller の認証情報:
+
+* *Username:* `admin`
+* *Password:* `ansible123!`
+====
+
+=== Task 1: Project を作成する
+
+最初に、公開 Git リポジトリーを参照する新しい project を作成します。
+
+. **Projects ページへ移動する。**
++
+左側ナビゲーションメニューで **Automation Execution** → **Projects** に移動します。
+
+. **新しい project を作成する。**
++
+青色の **Create project** ボタンを **クリック** します。
+
+. **project の詳細を入力する。**
++
+フォームに以下を入力します。
++
+* **Name:** `Apache playbooks`
+* **Organization:** `Default`
+* **Source Control Type:** `Git`
+* **Source Control URL:**
++
+[source,text]
+----
+https://github.com/ansible-tmm/instruqt-wyfp.git
+----
+
+. **project を保存する。**
++
+他の項目はそのままにして、青色の **Create project** ボタンを **クリック** します。
+
+=== Task 2: Project 同期を確認する
+
+Project を作成すると、Automation Controller は自動的に同期処理を開始し、Git リポジトリーから Playbook を取得します。
+
+. **project ステータスを確認する。**
++
+保存後、新しい project の *Details* タブに移動します。`Apache playbooks` project の *Status* が緑色で **Success** と表示されることを **確認** します。
+
+. **同期出力を確認する。**
++
+**Success** のステータステキストを **クリック** して同期ジョブの出力を確認します。Git clone 処理の詳細が表示されます。
+
+---
+
+== Controller as Code Alternative
+
+UI で作成した project は、単一の YAML エントリで定義できます。
+
+=== YAML 定義
+
+`controller-as-code/configs/module-04/controller_objects.yml` から
+
+[source,yaml]
+----
+---
+controller_projects:
+  - name: Apache playbooks
+    organization: Default
+    state: present
+    scm_type: git
+    scm_url: https://github.com/ansible-tmm/instruqt-wyfp.git
+    wait: true
+----
+
+`wait: true` パラメータは、project の同期が完了するまで処理を続行しないようにします。これは、UI でステータスが緑色に変わるのを確認するのと同じです。
+
+---
+
+== 次のステップ
+
+続行するには、下の青い `Next` ボタンを押してください。
+
+== トラブルシューティング
+
+問題が発生した場合や不具合を見つけた場合は、link:https://github.com/rhpds/zt-ans-bu-intro-controller-aap25/issues[GitHub で issue を作成してください]。

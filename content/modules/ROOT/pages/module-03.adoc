@@ -1,0 +1,168 @@
+= モジュール 3: Inventory の作成
+:notoc:
+:toc-title: Table of Contents
+:nosectnums:
+:icons: font
+
+_Automation Controller で Inventory を作成して内容を追加し、Host と Group を簡単に管理するためのガイド。_
+
+---
+
+== ラボ概要
+
+このセクションでは、Ansible Automation Platform の Inventory について概要を説明します。
+
+=== Inventory とは
+
+**Inventory** は、Playbook 内のコマンド、モジュール、タスクの実行対象となる Host と Host Group を定義します。Ansible と Automation Controller が管理対象システムを把握するための基本的な仕組みです。
+
+image::inventories-view.png[Inventories list view in automation controller, opts="border"]
+
+このチャレンジでは、新しい Inventory を作成し、Host を追加して、それらを整理する Group を作成します。
+
+image::create-inventory.png[Creating a new inventory, opts="border"]
+
+---
+
+== ラボガイド
+
+Inventory は、ジョブ（playbook など）を実行する対象 Host の集合です。Ansible の inventory file と同じ考え方ですが、強力な UI と追加機能があります。
+
+Inventory は *Group* に分かれ、各 Group に実際の *Host* が含まれます。Host は IP アドレスまたはホスト名で指定でき、手動またはクラウドプロバイダーからの動的取得で登録できます。
+
+[IMPORTANT]
+====
+automation controller の認証情報:
+
+* *Username:* `admin`
+* *Password:* `ansible123!`
+====
+
+=== Task 1: Inventory を作成する
+
+最初に、管理対象ノードを格納する空の Inventory を作成します。
+
+. **Inventories ページへ移動する。**
++
+左側ナビゲーションメニューで **Automation Execution** → **Infrastructure** → **Inventories** に移動します。
+
+. **新しい inventory を作成する。**
++
+青色の **Create inventory** ボタンを **クリック** し、ドロップダウンで **Create inventory** を選択します。
+
+. **inventory の詳細を入力する。**
++
+フォームに以下を入力します。
++
+* **Name:** `Lab-Inventory`
+* **Organization:** `Default`
+
+. **inventory を保存する。**
++
+青色の **Create inventory** ボタンを **クリック** します。
+
+=== Task 2: Inventory に Host を追加する
+
+次に、新しい inventory に 2 台の host を手動で追加します。
+
+NOTE: `Lab-Inventory` の詳細ページにいない場合は、Inventory 一覧で名前をクリックして戻ってください。
+
+. **Hosts タブへ移動する。**
++
+`Lab-Inventory` 内で **Hosts** タブを **クリック** します。
+
+. **最初の host を作成する。**
++
+青色の **Create host** ボタンを **クリック** します。*Name* フィールドに `node1` を入力し、他は変更せずに *Create host* を **クリック** します。
+
+. **2つ目の host を作成する。**
++
+**< Back to Hosts** のパンくずリンクをクリックして Host 一覧に戻ります。上記手順を **繰り返し**、`node2` という名前の 2 つ目の host を作成します。
+
+=== Task 3: Group を作成する
+
+Group は Host の整理や、複数 Host への変数適用に使います。
+
+. **Groups タブへ移動する。**
++
+`Lab-Inventory` のメインページに戻り、**Groups** タブを **クリック** します。
+
+. **新しい group を作成する。**
++
+青色の **Create group** ボタンを **クリック** します。
+
+. **group 名を設定する。**
++
+*Name* フィールドに `web` を入力します。
++
+NOTE: 静的 inventory file と異なり、UI では group 名を `[]` で囲む必要はありません。
+
+. **group を保存する。**
++
+青色の **Create group** ボタンを **クリック** します。
+
+=== Task 4: Group に Host を追加する
+
+最後に、作成した `web` group に 2 台の host を関連付けます。
+
+. **group の Hosts タブへ移動する。**
++
+作成した `web` group の中で **Hosts** タブを **クリック** します。
+
+. **既存 host を追加する。**
++
+青色の **Add existing host** ボタンを **クリック** します。
+
+. **hosts を選択する。**
++
+ポップアップで `node1` と `node2` の両方に **チェック** を入れ、*Add hosts* を **クリック** します。
+
+. **関連付けを確認する。**
++
+`web` group の *Hosts* タブに `node1` と `node2` が表示されていれば完了です。
+
+
+---
+
+== Controller as Code Alternative
+
+UI を通じて作成したすべての項目（inventory、host、group など）は、宣言型 YAML として定義し、`infra.aap_configuration` コレクションを使用して自動的に適用できます。
+
+=== YAML 定義
+
+以下の変数ファイル (`controller-as-code/configs/module-03/controller_objects.yml`) は、同じオブジェクトを定義しています。
+
+[source,yaml]
+----
+---
+controller_inventories:
+  - name: Lab-Inventory
+    organization: Default
+
+controller_hosts:
+  - name: node1
+    inventory: Lab-Inventory
+    state: present
+  - name: node2
+    inventory: Lab-Inventory
+    state: present
+
+controller_groups:
+  - name: web
+    inventory: Lab-Inventory
+    hosts:
+      - node1
+      - node2
+----
+
+`infra.aap_configuration` の `dispatch` ロールは、inventory、hosts、groups の順に、正しい依存関係の順序でオブジェクトを自動的に作成します。
+
+---
+
+== 次のステップ
+
+続行するには、下の青い `Next` ボタンを押してください。
+
+== トラブルシューティング
+
+問題が発生した場合や不具合を見つけた場合は、link:https://github.com/rhpds/zt-ans-bu-intro-controller-aap25/issues[GitHub で issue を作成してください]。

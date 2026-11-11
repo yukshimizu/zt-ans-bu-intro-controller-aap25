@@ -1,0 +1,112 @@
+= モジュール 7: 2つ目の Project の作成
+:notoc:
+:toc-title: Table of Contents
+:nosectnums:
+:icons: font
+
+_Automation Controller で新しい Project に 2つ目のリポジトリーを取り込むためのガイド。_
+
+---
+
+== ラボ概要
+
+プロジェクトの作成方法は既にご存知のはずです。`Apache playbooks` リポジトリをインポートした際に既に作成済みです。今回のチャレンジでは、今後の演習で使用する追加の Playbook を含む別の Git リポジトリを使用して、同じ手順を繰り返します。
+
+image::projects-list-all.png[Projects list view in automation controller, opts="border"]
+
+---
+
+== ラボガイド
+
+新しいプロジェクト `Additional playbooks` では、拡張サービスのインストール（`extended_services.yml`）、日替わりメッセージの設定（`motd_facts.yml`）、複数ユーザーの作成（`loop_users.yml`）を行うための playbook を含むリポジトリをインポートします。これにより、プロジェクト作成のワークフローを習得するとともに、今後のチャレンジで必要となるコンテンツを準備することができます。
+
+[IMPORTANT]
+====
+automation controller へのログイン認証情報:
+
+* *Username:* `admin`
+* *Password:* `ansible123!`
+====
+
+=== Task 1: 2つ目の Project を作成する
+
+最初に、別の公開 Git リポジトリーを参照する新しい project を作成します。
+
+. **Projects ページへ移動する。**
++
+左側ナビゲーションメニューで **Automation Execution** → **Projects** に移動します。
+
+. **新しい project を作成する。**
++
+青色の **Create project** ボタンを **クリック** します。
+
+. **project の詳細を入力する。**
++
+フォームに以下を入力します。
++
+* **Name:** `Additional playbooks`
+* **Organization:** `Default`
+* **Source Control Type:** `Git`
+* **Source Control URL:**
++
+[source,text]
+----
+https://github.com/ansible-tmm/instruqt-wyfp-additional.git
+----
+
+. **project を保存する。**
++
+他の項目はそのままにして、青色の **Create project** ボタンを **クリック** します。
+
+=== Task 2: Project 同期を確認する
+
+project を作成すると、Automation Controller は自動的に同期処理を開始し、Git リポジトリーから playbook を取得します。
+
+. **project ステータスを確認する。**
++
+保存後、新しい project の *Details* ページに移動します。*Last Job Status* は最初、青色の **Running** と表示されます。
+
+. **同期成功を確認する。**
++
+数秒後にステータスが **Successful** に変わり、緑色になります。これは project が正しく同期されたことを示します。
+
+. **（別方法）Projects 一覧でステータスを確認する。**
++
+**Projects** メインページ（**Automation Execution** → **Projects**）に戻って確認することもできます。
++
+--
+a. `Additional playbooks` の *Status* 列が緑色で **Successful** と表示されることを **確認** します。
+b. **Successful** ステータステキストを **クリック** して同期ジョブ出力を確認します。
+--
+
+---
+
+== Controller as Code Alternative
+
+2つ目の Project を追加するには、変数ファイルにエントリを追加するだけです。`dispatch` ロールが同期を自動的に処理します。
+
+=== YAML 定義
+
+`controller-as-code/configs/module-07/controller_objects.yml` から
+
+[source,yaml]
+----
+---
+controller_projects:
+  - name: Additional playbooks
+    organization: Default
+    state: present
+    scm_type: git
+    scm_url: https://github.com/ansible-tmm/instruqt-wyfp-additional.git
+    wait: true
+----
+
+---
+
+== 次のステップ
+
+続行するには、下の青い `Next` ボタンを押してください。
+
+== トラブルシューティング
+
+問題が発生した場合や不具合を見つけた場合は、link:https://github.com/rhpds/zt-ans-bu-intro-controller-aap25/issues[GitHub で issue を作成してください]。

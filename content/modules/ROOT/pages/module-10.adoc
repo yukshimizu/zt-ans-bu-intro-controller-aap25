@@ -1,0 +1,210 @@
+= モジュール 10: Survey 付き Job Template の作成
+:notoc:
+:toc-title: Table of Contents
+:nosectnums:
+:icons: font
+
+_Apache をインストールする 4 つ目の Job Template を作成し、実行時に変数を渡す Survey を含めるためのガイド。_
+
+---
+
+== ラボ概要
+
+この最後のチャレンジでは、Job Template のもう1つの強力な機能である **Survey** について学びます。Survey を使用すると、ジョブの実行時にユーザーに入力を促すことができ、Playbook 自体を編集することなく、実行ごとにパラメータをカスタマイズすることが可能になります。
+
+image::templates-view-example-templates.png[Job Templates list view in automation controller, opts="border"]
+
+---
+
+== ラボガイド
+
+**Survey** 機能は、Job Template に使いやすい入力フォームを追加します。template が起動されると、Survey は playbook に追加変数として渡される値の入力を求めます。このチャレンジでは、Survey を使用して、Apache playbook によってデプロイされる `index.html` ファイルをあなたの名前でカスタマイズします。
+
+[IMPORTANT]
+====
+automation controller へのログイン認証情報:
+
+* *Username:* `admin`
+* *Password:* `ansible123!`
+====
+
+=== Task 1: Job Template を作成する
+
+最初に、survey 変数で動作する playbook を使う新しい job template を作成します。
+
+. **Templates ページへ移動する。**
++
+左側ナビゲーションメニューで **Automation Execution** → **Templates** に移動します。
+
+. **新しい job template を作成する。**
++
+青色の **Create template** ボタンを **クリック** し、**Create job template** を選択します。
+
+. **job template の詳細を入力する。**
++
+フォームに以下を入力します。
++
+* **Name:** `Install Apache with Survey`
+* **Job Type:** `Run`
+* **Inventory:** `Lab-Inventory`
+* **Project:** `Apache playbooks`
+* **Playbook:** `apache_template.yml`
+* **Credentials:** `lab-credentials` を選択
+* **Privilege Escalation:** `become` を有効にするため **チェック**
+
+. **job template を保存する。**
++
+他の項目はそのままにして、青色の **Create job template** ボタンを **クリック** します。
+
+=== Task 2: Survey を作成する
+
+次に、job template に survey を追加してユーザー名を尋ねます。
+
+. **Survey タブへ移動する。**
++
+Job Template を保存すると *Details* ページに移動します。**Survey** タブを **クリック** します。
+
+. **新しい survey 質問を作成する。**
++
+青色の **Create survey question** ボタンを **クリック** します。
+
+. **survey 質問を設定する。**
++
+フォームに以下を入力します。
++
+--
+* **Question:** `What is your name, fellow student?`
+* **Description:** `Enter your name or nickname to see it work!`
+* **Answer variable name:** `student_name`
+* **Answer type:** `Text`（デフォルト）
+* **Required:** **チェックしない**
+* **Default answer:** `Skippy`
+--
+
+. **survey 質問を保存する。**
++
+下部の青色 **Create survey question** ボタンを **クリック** します。
+
+. **survey を有効化する。**
++
+Survey タブで **Survey disabled** と表示されるトグルが出ます。このトグルを **クリック** して survey を **有効化** します。
+
+=== Task 3: Template を起動して Survey を使う
+
+最後に template を起動し、survey でカスタム値を入力します。
+
+. **template を起動する。**
++
+`Install Apache with Survey` job template 画面上部の **Launch template** ボタンを **クリック** します。
+
+. **survey 質問に回答する。**
++
+survey 入力画面が表示されます。デフォルト回答（`Skippy`）を **削除** し、**自分の名前** を入力します。
+
+. **ジョブを起動する。**
++
+**Next** ボタンを **クリック** し、内容確認後に **Finish** ボタンを **クリック** してジョブを起動します。
+
+. **結果を確認する。**
++
+ジョブが成功したら、ラボ画面上部の **Node1 Web** タブに **移動** します。必要に応じてページをリロードしてください。Apache メッセージの下に入力した名前が表示されます。
++
+
+image:validate-survey.png[Customized Apache welcome page, opts="border"]
+
+---
+
+== Controller as Code Alternative
+
+question、variable name、type、default value など、UIを通じて手動で設定した survey は job template のYAMLファイル内にインラインで定義されます。
+
+=== YAML 定義
+
+`controller-as-code/configs/module-10/controller_objects.yml`から
+
+[source,yaml]
+----
+---
+controller_templates:
+  - name: Install Apache with Survey
+    organization: Default
+    state: present
+    inventory: Lab-Inventory
+    become_enabled: true
+    playbook: apache_template.yml
+    project: Apache playbooks
+    credentials:
+      - lab-credentials
+    survey_enabled: true
+    survey_spec:
+      name: Apache Survey
+      description: Survey for Apache template deployment
+      spec:
+        - question_name: "What is your name, fellow student?"
+          question_description: >-
+            Enter your name or nickname to see it work!
+          variable: student_name
+          type: text
+          required: false
+          default: Skippy
+----
+
+=== サマリ: UI と Controller as Code の比較
+
+[cols="1,1,1"]
+|===
+| 視点 | UI (ワークショップ) | Controller as Code
+
+| **オブジェクト作成**
+| Webフォームから手動
+| 宣言型 YAML 変数ファイル
+
+| **再現性**
+| 環境ごとに手順を繰り返す
+| 単一 playbook であらゆる環境に適用
+
+| **バージョンコントロール**
+| 不可能
+| すべての変更の完全な Git 履歴
+
+| **冪等性**
+| N/A
+| 内蔵 ‐ いつでも安全に再実行可能
+
+| **依存関係の順序**
+| 手動 (template の前に inventory を作成する必要あり)
+| `dispatch` ロールにより自動
+
+| **監査証跡**
+| Controller のアクティビティ履歴
+| Git commits + Controller のアクティビティ履歴
+|===
+
+---
+
+== おめでとうございます！
+
+ラボは正常に完了しました！ 🎉
+
+空の Automation Controller から始めて、完全なオートメーションを構築しました。管理対象ホストを含​​む **Inventory**、Git から Playbook をインポートする **Project**、安全な認証のための **Credential**、それらの Playbook を実行するための **Job Template**、条件付きロジックで複数の template を連結する **Workflow**、および実行時にユーザー入力を収集する **Survey** について学習しました。
+
+[IMPORTANT]
+====
+ラボを完了するには、下の青色の **Next** ボタンを押してください。皆様からのフィードバックをお待ちしております！
+====
+
+=== バッジを受け取る
+
+次の QR コードをスキャンして、このラボ完了の Ansible Forum バッジを受け取ってください。
+
+image::badge-qr-code.png[QR code for Ansible Forum badge, opts="border"]
+
+まだ Ansible Forum アカウントがない場合でも問題ありません。同じリンクから登録できます。Google または GitHub アカウントでログインすれば、自動的にアカウントが作成されます。
+
+登録後は、link:https://forum.ansible.com/t/introduce-yourself-2025-edition/39892[this Forum topic] で自己紹介するのを忘れないでください。
+
+---
+
+== トラブルシューティング
+
+問題が発生した場合や不具合を見つけた場合は、link:https://github.com/rhpds/zt-ans-bu-intro-controller-aap25/issues[GitHub で issue を作成してください]。

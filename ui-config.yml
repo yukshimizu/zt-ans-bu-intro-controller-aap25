@@ -1,0 +1,52 @@
+---
+
+antora:
+  name: modules
+  dir: www
+  modules:
+    - name: module-01
+      label: "AAP Controller へようこそ"
+      solveButton: false
+    - name: module-02
+      label: "ラボガイド: Automation Controller 入門"
+      solveButton: false
+    - name: module-03
+      label: "ラボガイド: Inventory の作成"
+      solveButton: true
+    - name: module-04
+      label: "ラボガイド: 最初の Project を作成する"
+      solveButton: true
+    - name: module-05
+      label: "ラボガイド: Credential の理解"
+      solveButton: true
+    - name: module-06
+      label: "ラボガイド: Job Template の作成"
+      solveButton: true
+    - name: module-07
+      label: "ラボガイド: 2つ目の Project を作成する"
+      solveButton: true
+    - name: module-08
+      label: "ラボガイド: 複数の Job Template を作成する"
+      solveButton: true
+    - name: module-09
+      label: "ラボガイド: Workflow Job Template の作成"
+      solveButton: true
+    - name: module-10
+      label: "ラボガイド: Survey 付き Job Template の作成"
+      solveButton: true
+
+
+tabs:
+  - name: Automation Controller
+    url: https://control-${guid}.${domain}/
+  - name: "Node1 Web"
+    url: https://node1-${guid}.${domain}/index.html
+    modules:
+     - module-06
+     - module-10
+  - name: "Node2 Web"
+    url: https://node2-${guid}.${domain}/index.html
+    modules:
+     - module-06
+  # - name: ">_ Terminal"
+  #   url: /wetty

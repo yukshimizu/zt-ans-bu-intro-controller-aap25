@@ -1,0 +1,197 @@
+= モジュール 9: Workflow Job Template の作成
+:notoc:
+:toc-title: Table of Contents
+:nosectnums:
+:icons: font
+
+_複数 Playbook を条件分岐付きの Workflow でつなぎ、全体を連携させるためのガイド。_
+
+---
+
+== ラボ概要
+
+これまでのところ、各 Job Template は1つの Playbook を独立して実行していました。**Workflow Job Template** を使用すると、複数の Job Template を単一の自動化パイプラインに接続できます。このパイプラインには、条件付きロジック、並列実行、エラー処理が組み込まれています。
+
+image::wf-template-example-list.png[Workflow Job Templates list view, opts="border"]
+
+---
+
+== ラボガイド
+
+**Workflow Job Template** は、定義された順序で複数の自動化ステップをオーケストレーションします。*Workflow Visualizer* を使用してフローをグラフィカルに設計し、各ステップは成功時、失敗時、または前のステップの実行後に無条件で実行できます。
+
+Workflow では、次のようなノードタイプをオーケストレーションできます。
+
+* Job templates
+* 他の workflow job templates
+* Project syncs
+* Inventory source syncs
+
+[WARNING]
+====
+Job Template のチャレンジで述べたように、**Workflow Job Template** は、**Job Template**（単一の playbook を実行するもの）と **Jinja2 template**（playbook内で動的なファイルコンテンツを生成するもの）のどちらとも異なります。これらは3つの異なる概念です。
+====
+
+[IMPORTANT]
+====
+automation controller へのログイン認証情報:
+
+* *Username:* `admin`
+* *Password:* `ansible123!`
+====
+
+=== Task 1: Workflow Template を作成する
+
+最初に、job templates を含めるメイン workflow を作成します。
+
+. **Templates ページへ移動する。**
++
+左側ナビゲーションメニューで **Automation Execution** → **Templates** に移動します。
+
+. **新しい workflow job template を作成する。**
++
+青色の **Create template** ボタンを **クリック** し、**Create workflow job template** を選択します。
+
+. **workflow の詳細を入力する。**
++
+フォームに以下を入力します。
++
+* **Name:** `Your first workflow`
+* **Description:** `Create a Workflow from previous Job Templates`
+* **Organization:** `Default`
+* **Inventory:** `Lab-Inventory`
+
+. **workflow を保存する。**
++
+他の項目はそのままにして、青色の **Create workflow job template** ボタンを **クリック** します。
+
+=== Task 2: Workflow Visualizer で最初のステップを追加する
+
+保存後、Workflow Visualizer に移動し、workflow をグラフィカルに構築します。
+
+. **最初のステップを追加する。**
++
+最初のノードを追加するため、**Add step** ボタンを **クリック** します。
+
+. **最初のノードを設定する。**
++
+表示された *Add step* サイドパネルで、以下のように設定します。
++
+* **Node Type:** `Job Template` (default)
+* **Job Template:** `Install Apache`
+* **Convergence:** `Any`
+* **Node alias:** `apache101`（Visualizer 上で識別するためのラベル）
+
+. **ノードを保存する。**
++
+**Next** を **クリック** し、内容確認後に **Finish** を **クリック** します。
+
+=== Task 3: 条件付きステップを追加する
+
+次に、最初のステップが成功した場合のみ実行される 2つ目のステップを追加します。
+
+. **新しい連結ステップを追加する。**
++
+`apache101` ノードに **マウスオーバー** し、**+** アイコンを **クリック** して **Add step and link** を選択します。
+
+. **2つ目のノードを設定する。**
++
+サイドパネルで以下を設定します。
++
+* **Node Type:** `Job Template` (default)
+* **Job Template:** `Extended services`
+* **Run:** `On Success`
+* **Convergence:** `Any`
+* **Node alias:** `extended201`
+
+. **ノードを保存する。**
++
+**Next** を **クリック** し、内容確認後に **Finish** を **クリック** します。
+
+=== Task 4: 並列ステップを追加する
+
+次に、最初のステップの後に 2つ目と並列で実行される 3つ目のステップを追加します。
+
+. **最初のノードから別の連結ステップを追加する。**
++
+再度 `apache101` ノードに **マウスオーバー** し、**+** アイコンを **クリック** して **Add step and link** を選択します。
+
+. **3つ目のノードを設定する。**
++
+* **Node Type:** `Job Template` (default)
+* **Job Template:** `Set motd`
+* **Run:** `On Success`
+* **Convergence:** `Any`
+* **Node alias:** `motd201`
+
+. **ノードを保存する。**
++
+**Next** を **クリック** し、内容確認後に **Finish** を **クリック** します。
+
+. **workflow 全体を保存する。**
++
+最後に、Visualizer 右上の青色 **Save** ボタンを **クリック** します。この手順を忘れると変更が失われます!
+
+=== Task 5: Workflow を起動する
+
+これで多段 workflow を実行する準備ができました。
+
+. **Visualizer から workflow を起動する。**
++
+Workflow Visualizer 画面のまま、右上の **Launch** ボタンを **クリック** します。
+
+. **実行を確認する。**
++
+workflow 実行のリアルタイムビューに移動します。最初に `apache101` ジョブが実行され、成功後に `extended201` と `motd201` が並列実行されます。各ノードの緑のチェックマーク（✅）は成功を示します。
+
+. **（別方法）Templates 一覧から起動する。**
++
+**Templates** ページに戻り、`Your first workflow` の横にある **Launch** アイコン（🚀）をクリックして起動することもできます。
+
+---
+
+== Controller as Code Alternative
+
+Visualizer でグラフィカルに構築した workflow（ノード接続や並列実行パスを含む）は、`simplified_workflow_nodes` を使用してYAMLとして完全に表現できます。
+
+=== YAML 定義
+
+`controller-as-code/configs/module-09/controller_objects.yml`から
+
+[source,yaml]
+----
+---
+controller_workflows:
+  - name: Your first workflow
+    description: Create a Workflow from previous Job Templates
+    organization: Default
+    inventory: Lab-Inventory
+    simplified_workflow_nodes:
+      - identifier: apache101
+        unified_job_template: Install Apache
+        success_nodes:
+          - extended201
+          - motd201
+
+      - identifier: extended201
+        unified_job_template: Extended services
+
+      - identifier: motd201
+        unified_job_template: Set motd
+----
+
+構造が Visualizer で構築したものにどのように直接マッピングされているかに注目してください。
+
+* `apache101` は開始ノードです (Apache をインストールします)
+* `success_nodes` は条件付きリンクを定義します — `extended201` と `motd201` は両方とも成功時に並行して実行されます
+* 各 `identifier` は、UI で設定した *Node alias* に対応します
+
+---
+
+== 次のステップ
+
+続行するには、下の青い `Next` ボタンを押してください。
+
+== トラブルシューティング
+
+問題が発生した場合や不具合を見つけた場合は、link:https://github.com/rhpds/zt-ans-bu-intro-controller-aap25/issues[GitHub で issue を作成してください]。
